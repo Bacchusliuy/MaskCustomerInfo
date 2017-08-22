@@ -27,7 +27,7 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
     private Boolean containsStreetInfo;
     //取得所有省市区信息数据
     private ArrayList<Province> allProvince;
-    private Boolean processed;
+//    private Boolean processed;
 
 
     public CustomerInfoMaskImp() {
@@ -39,7 +39,7 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
         this.makebelieveDistrictName = "";
         containsStreetInfo = false;
         this.allProvince = new ArrayList<Province>();
-       processed=false;
+// TEST        processed=false;
     }
 
     @Override
@@ -48,33 +48,33 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
         if (containsStreetInfo && verifyStreetDetailInfo(info)) {
 // TEST           System.out.println("is streetinfo");
             result = maskStreatDetailInfo(info);
-            processed=true;
+// TEST             processed=true;
         }
         if (verifyZipcode(info)) {
 //TEST            System.out.println("is zipcode");
             result = maskZipCode(info);
-            processed=true;
+// TEST             processed=true;
         }
         if (verifyPhoneNumber(info)) {
 //TEST            System.out.println("is phonenumberinfo");
             result = maskPhoneNumber(info);
-            processed=true;
+// TEST             processed=true;
         }
         if (verifyQQNum(info) && !verifyPhoneNumber(info)) {
 //TEST             System.out.println("is qqnuminfo");
             result = maskQQNum(info);
-            processed=true;
+// TEST             processed=true;
         }
         if (verifyEmile(info)) {
 //TEST            System.out.println("is emileinfo");
             result = maskEmile(info);
-           processed=true;
+            // TEST           processed=true;
         }
         if (verifyUserId(info) && !verifyStreetDetailInfo(info) && !verifyZipcode(info)
             && !verifyPhoneNumber(info) && !verifyQQNum(info) && !verifyEmile(info)) {
 //TEST             System.out.println("is userid");
             result = maskUserId(info);
-             processed=true;
+// TEST              processed=true;
         }
         return result;
     }
@@ -91,7 +91,7 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
         this.makebelieveDistrictName = "";
         containsStreetInfo = false;
         this.allProvince = new ArrayList<Province>();
-         processed=false;
+        // TEST         processed=false;
     }
 
 
@@ -317,45 +317,48 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
         String customerInfo = harshProcessStreetInfo(info);
 
         String processedStr = "";
+        StringBuilder puctuations=new StringBuilder();
         // 将：  。 、 ；替代为,
-        String[] puctuation = {"。", ",", ";", "；", ":", "：", "、", " "};
+        String[] puctuation = {"。", ",","，", ";", "；", ":", "：", "、", " "};
         for (int i = 0; i < customerInfo.length(); i++) {
             for (int j = 0; j < puctuation.length; j++) {
-                if (String.valueOf(customerInfo.charAt(i)).equals(puctuation[j])) {
+              if (String.valueOf(customerInfo.charAt(i)).equals(puctuation[j])) {
                     StringBuilder sb = new StringBuilder(customerInfo);
                     sb.replace(i, i + 1, "，");
                     customerInfo = sb.toString();
-
+                    puctuations.append(puctuation[j]);
                 }
             }
         }
         String[] childStrings = customerInfo.split("，");
+        String puctuationstr=puctuations.toString();
+        puctuationstr+=" ";
         //分别将子串进行处理
         for (int i = 0; i < childStrings.length; i++) {
-            processedStr += maskCustomerInfo(childStrings[i]) + " ";
+            processedStr += maskCustomerInfo(childStrings[i]) + String.valueOf(puctuationstr.charAt(i));
         }
 
         //去掉最末字符
         if (processedStr.length() >= 1) {
             processedStr = processedStr.substring(0, processedStr.length() - 1);
         }
-        if(processed)
-        {
-            File file = new File("D:/Project_yl/CustomerInfoMask/src/masked-data-All.txt");
-            try {
-                if(!file.exists()) {
-                    file.createNewFile();
-                }
-                RandomAccessFile rf=new RandomAccessFile(file,"rw");
-                rf.seek(rf.length());
-                rf.writeUTF(info+"\r\n");
-                rf.writeUTF(processedStr+"\r\n");
-                rf.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        if(processed)
+//        {
+//            File file = new File("D:/Project_yl/CustomerInfoMask/src/masked-data-All.txt");
+//            try {
+//                if(!file.exists()) {
+//                    file.createNewFile();
+//                }
+//                RandomAccessFile rf=new RandomAccessFile(file,"rw");
+//                rf.seek(rf.length());
+//                rf.writeUTF(info+"\r\n");
+//                rf.writeUTF(processedStr+"\r\n");
+//                rf.close();
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         //保证字长相等
         if (processedStr.length() == info.length()) {
             this.reinitializeData();
@@ -858,24 +861,24 @@ public class CustomerInfoMaskImp implements CustomerInfoMask {
 //        System.out.println(str);
 
 //TEST
-       try {
-           File file=new File("./CustomerInfoMask/src/mask-data-All.txt");
-           if(file.isFile() && file.exists()){ //判断文件是否存在
-               InputStreamReader read = new InputStreamReader(
-                       new FileInputStream(file),"UTF-8");//考虑到编码格式
-               BufferedReader bufferedReader = new BufferedReader(read);
-               String lineTxt = null;
-               while((lineTxt = bufferedReader.readLine()) != null){
-                       System.out.println(
-                           lineTxt + "\t\t\t\t\t" + customerInfoMaskImp.processStr(lineTxt));
-               }
-               read.close();
-           }else{
-               System.out.println("找不到指定的文件");
-           }
-       } catch (Exception e) {
-           System.out.println("读取文件内容出错");
-           e.printStackTrace();
-       }
+//       try {
+//           File file=new File("./CustomerInfoMask/src/mask-data-All.txt");
+//           if(file.isFile() && file.exists()){ //判断文件是否存在
+//               InputStreamReader read = new InputStreamReader(
+//                       new FileInputStream(file),"UTF-8");//考虑到编码格式
+//               BufferedReader bufferedReader = new BufferedReader(read);
+//               String lineTxt = null;
+//               while((lineTxt = bufferedReader.readLine()) != null){
+//                       System.out.println(
+//                           lineTxt + "\t\t\t\t\t" + customerInfoMaskImp.processStr(lineTxt));
+//               }
+//               read.close();
+//           }else{
+//               System.out.println("找不到指定的文件");
+//           }
+//       } catch (Exception e) {
+//           System.out.println("读取文件内容出错");
+//           e.printStackTrace();
+//       }
     }
 }
